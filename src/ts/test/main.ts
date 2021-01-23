@@ -8,6 +8,12 @@
 import {CharacterStream} from "../data/cs.ts";
 import {Xml} from "../data/xml.ts";
 import {zlib_raw_deflate} from "../io/deflate.ts";
+import {
+    zlib_raw_inflate,
+    zlib_raw_inflate_init,
+    zlib_raw_inflate_process,
+    zlib_raw_inflate_term
+} from "../io/inflate.ts";
 
 function main(args: string[]) {
     test_cs();
@@ -54,6 +60,27 @@ function test_deflate() {
     assert_eq(0x63,ys[MAX_BLOCK_SIZE*2+15]);
     assert_eq(0x63,ys[MAX_BLOCK_SIZE*3-1]);
     //Deno.writeFileSync('00.bin', ys);
+
+    // const zs = test_zlib_raw_inflate(ys);
+    const zs = zlib_raw_inflate(ys);
+    assert_eq(xs.byteLength, zs.byteLength);
+    for (let i = 0; i < xs.byteLength; i++) {
+        assert_eq(xs[i], zs[i]);
+    }
+}
+
+function test_zlib_raw_inflate(p: Uint8Array) {
+    const is = zlib_raw_inflate_init();
+    const ns = Math.floor(p.byteLength / 2);
+    let a = 0;
+    for (;a < p.byteLength;) {
+        let b = a+ns;
+        b = b > p.byteLength ? p.byteLength : b;
+        const q = p.subarray(a, b);
+        zlib_raw_inflate_process(is, q);
+        a += b-a;
+    }
+    return zlib_raw_inflate_term(is);
 }
 
 if (import.meta.main) main(Deno.args);

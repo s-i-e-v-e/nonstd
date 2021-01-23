@@ -27,7 +27,6 @@ function deflate(xs: Uint8Array) {
     for (let i = 0; i < n; i++) {
         let size = xs.length - roffs;
         size = size > MAX_BLOCK_SIZE ? MAX_BLOCK_SIZE : size;
-        // console.log(`deflating. roffs: ${roffs}, woffs: ${woffs}, size: ${size}`);
 
         const is_final = i+1 === n;
 
