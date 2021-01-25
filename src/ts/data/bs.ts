@@ -58,6 +58,14 @@ export class BitStream {
         return this.index >= this.xs.byteLength;
     }
 
+    pos() {
+        return this.index;
+    }
+
+    slice(start: number, end: number) {
+        return this.xs.slice(start, end);
+    }
+
     skip_byte() {
         if (this.bits > 0) {
             this.bits = 0;
@@ -67,7 +75,7 @@ export class BitStream {
 
     resize_adhoc() {
         if (this.index < this.xs.byteLength) return;
-        const n = Math.ceil(this.index / 4096)*4096; // round to next 4K
+        const n = Math.ceil(this.index || 1 / 4096)*4096; // round to next 4K
         const xs = new Uint8Array(n);
         xs.set(this.xs, 0);
         this.xs = xs;
