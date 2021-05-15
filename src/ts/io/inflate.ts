@@ -116,7 +116,7 @@ function decode_block(ins: BitStream, outs: BitStream, tree_alph: HuffmanTree, t
                 let n = m+l;
                 n = n <= outs.pos()? n : outs.pos();
                 const ys = outs.slice(m, n);
-                if (m < 0 || n < m || ys.length === 0) throw new Error(`idx: ${outs.pos()}, m: ${m}, n: ${n}`);
+                if (m < 0 || n < m || ys.length === 0) throw new Error(`idx: ${outs.pos()}, m: ${m}, n: ${n}, ys.length: ${ys.length}`);
                 outs.write_bytes(ys);
                 l -= ys.length;
                 d += ys.length;
