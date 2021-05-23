@@ -41,7 +41,7 @@ export class BitStream {
     }
 
     set(bs: BitStream) {
-        if (!bs.index) throw new Error();
+        //if (!bs.index) throw new Error();
         this.index = bs.index;
         this.bits = bs.bits;
         this.xs = bs.xs;

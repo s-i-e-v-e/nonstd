@@ -20,6 +20,7 @@ export function zlib_inflate_either(p: Uint8Array) {
 export function zlib_raw_inflate(p: Uint8Array) {
     const is = zlib_raw_inflate_init();
     zlib_raw_inflate_process(is, p);
+    if (!is.eos) throw new Error();
     return zlib_raw_inflate_term(is);
 }
 
