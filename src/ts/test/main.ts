@@ -15,18 +15,40 @@ import {
     zlib_raw_inflate_process,
     zlib_raw_inflate_term
 } from "../io/inflate.ts";
+import {fs_dir_exists, fs_file_exists, fs_ls, fs_parse_path} from "../os/fs.ts";
 
 function main(args: string[]) {
     test_cs();
     test_xml();
+    test_fs();
 
     test_deflate();
     test_inflate_fixed();
     test_inflate_dynamic();
 }
 
+function assert(condition: boolean) {
+    if (!condition) throw new Error();
+}
+
 function assert_eq(expected: any, found: any) {
-    if (found !== expected) throw new Error(`Expected: ${expected}, Found: ${found}`);
+    let eq = false;
+    if (Array.isArray(expected) && Array.isArray(found)) {
+        if (expected.length === found.length) {
+            eq = true;
+            for (let i = 0; i < expected.length; i++) {
+                assert_eq(expected[i], found[i]);
+            }
+        }
+    }
+    else if (typeof expected === 'object' && typeof found === 'object') {
+        eq = true;
+        assert_eq(JSON.stringify(expected),JSON.stringify(found));
+    }
+    else {
+        eq = found === expected;
+    }
+    if (!eq) throw new Error(`Expected: ${expected}, Found: ${found}`);
 }
 
 function test_cs() {
@@ -122,8 +144,8 @@ function test_inflate_fixed() {
 }
 
 function test_inflate_dynamic() {
-    assert_eq(Deno.readTextFileSync('./.ignore/zlib/rfc3977.txt'), to_utf8(zlib_inflate_either(Deno.readFileSync('./.ignore/zlib/rfc3977.txt.raw'))));
-    assert_eq(Deno.readTextFileSync('./.ignore/zlib/rfc1951.txt'), to_utf8(zlib_inflate_either(Deno.readFileSync('./.ignore/zlib/rfc1951.txt.raw'))));
+    assert_eq(Deno.readTextFileSync('./test/zlib/rfc3977.txt'), to_utf8(zlib_inflate_either(Deno.readFileSync('./test/zlib/rfc3977.txt.raw'))));
+    assert_eq(Deno.readTextFileSync('./test/zlib/rfc1951.txt'), to_utf8(zlib_inflate_either(Deno.readFileSync('./test/zlib/rfc1951.txt.raw'))));
 }
 
 function test_zlib_raw_inflate(p: Uint8Array) {
@@ -138,6 +160,20 @@ function test_zlib_raw_inflate(p: Uint8Array) {
         a += b-a;
     }
     return zlib_raw_inflate_term(is);
+}
+
+function test_fs() {
+    assert(fs_dir_exists('./test'));
+    assert(!fs_dir_exists('./does_not_exist'));
+
+    assert(fs_file_exists('./test/zlib/rfc3977.txt'));
+    assert(!fs_file_exists('./does_not_exist'));
+
+    assert_eq(['zlib'], fs_ls('./test').map(x => x.name));
+
+    assert_eq(['rfc1951.txt', 'rfc3977.txt', 'rfc1951.txt.raw', 'rfc3977.txt.raw'].sort(), fs_ls('./test/zlib').map(x => x.name).sort());
+
+    assert_eq({dir: '.', name: 'test', ext: ''}, fs_parse_path('./test'));
 }
 
 if (import.meta.main) main(Deno.args);
