@@ -100,7 +100,7 @@ export function fs_read_utf8_list(path: string) {
     return fs_read_utf8(path).split('\n');
 }
 
-export function io_write_utf8_list(path: string, data: string[]) {
+export function fs_write_utf8_list(path: string, data: string[]) {
     path = fs_canonical_path(path);
     fs_write_utf8(path, data.join('\n'));
 }
