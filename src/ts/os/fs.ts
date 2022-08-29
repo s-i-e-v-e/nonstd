@@ -9,8 +9,19 @@ import {copySync} from "https://deno.land/std/fs/copy.ts"
 
 import DirEntry = Deno.DirEntry;
 
+export function fs_canonical_path(path: string) {
+    const home = Deno.env.get('HOME');
+    if (!home) throw new Error('$HOME is not defined.');
+    const xdg_config_home = Deno.env.get('XDG_CONFIG_HOME') || `${home}/.config`;
+
+    path = path.replace('$XDG_CONFIG_HOME', xdg_config_home);
+    path = path.replace('$HOME', home);
+    return path;
+}
+
 function fs_exists(path: string) {
     try {
+        path = fs_canonical_path(path);
         return Deno.statSync(path);
     }
     catch (e) {
@@ -34,6 +45,7 @@ export function fs_file_exists(path: string) {
 }
 
 export function fs_ls(path: string): DirEntry[] {
+    path = fs_canonical_path(path);
     return Array.from(Deno.readDirSync(path));
 }
 
@@ -41,9 +53,11 @@ interface FileName {
     dir: string,
     name: string,
     ext: string,
+    path: string,
 }
 
 export function fs_parse_path(path: string) {
+    path = fs_canonical_path(path);
     let n = path.lastIndexOf("/");
     const dir = n === -1 ? "." : path.substring(0, n);
     path = n === -1 ? path : path.substring(n + 1);
@@ -55,31 +69,38 @@ export function fs_parse_path(path: string) {
         dir: dir,
         name: name,
         ext: ext,
+        path: `${dir}/${name}${ext}`
     } as FileName;
 }
 
-function fs_mkdir(dir: string) {
-    if (!fs_exists(dir)) Deno.mkdirSync(dir, { recursive: true });
+function fs_mkdir(path: string) {
+    path = fs_canonical_path(path);
+    if (!fs_exists(path)) Deno.mkdirSync(path, { recursive: true });
 }
 
 export function fs_cp(source: string, dest: string) {
+    source = fs_canonical_path(source);
+    dest = fs_canonical_path(dest);
     copySync(source, dest);
 }
 
-export function fs_write_utf8(p: string, data: string) {
-    const fp = fs_parse_path(p);
+export function fs_write_utf8(path: string, data: string) {
+    const fp = fs_parse_path(path);
     fs_mkdir(fp.dir);
-    Deno.writeTextFileSync(p, data);
+    Deno.writeTextFileSync(fp.path, data);
 }
 
-export function fs_read_utf8(p: string) {
-    return Deno.readTextFileSync(p);
+export function fs_read_utf8(path: string) {
+    path = fs_canonical_path(path);
+    return Deno.readTextFileSync(path);
 }
 
 export function fs_read_utf8_list(path: string) {
+    path = fs_canonical_path(path);
     return fs_read_utf8(path).split('\n');
 }
 
 export function io_write_utf8_list(path: string, data: string[]) {
+    path = fs_canonical_path(path);
     fs_write_utf8(path, data.join('\n'));
 }

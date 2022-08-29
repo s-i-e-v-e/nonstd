@@ -173,7 +173,8 @@ function test_fs() {
 
     assert_eq(['rfc1951.txt', 'rfc3977.txt', 'rfc1951.txt.raw', 'rfc3977.txt.raw'].sort(), fs_ls('./test/zlib').map(x => x.name).sort());
 
-    assert_eq({dir: '.', name: 'test', ext: ''}, fs_parse_path('./test'));
+    assert_eq({dir: '.', name: 'test', ext: '', path: './test'}, fs_parse_path('./test'));
+    assert_eq({dir: './test', name: 'abc.tar', ext: '.gz', path: './test/abc.tar.gz'}, fs_parse_path('./test/abc.tar.gz'));
 }
 
 if (import.meta.main) main(Deno.args);
