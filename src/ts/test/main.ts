@@ -16,11 +16,13 @@ import {
     zlib_raw_inflate_term
 } from "../io/inflate.ts";
 import {fs_dir_exists, fs_file_exists, fs_ls, fs_parse_path} from "../os/fs.ts";
+import {ps_exec} from "../os/ps.ts";
 
 function main(args: string[]) {
     test_cs();
     test_xml();
     test_fs();
+    test_ps();
 
     test_deflate();
     test_inflate_fixed();
@@ -175,6 +177,15 @@ function test_fs() {
 
     assert_eq({dir: '.', name: 'test', ext: '', path: './test'}, fs_parse_path('./test'));
     assert_eq({dir: './test', name: 'abc.tar', ext: '.gz', path: './test/abc.tar.gz'}, fs_parse_path('./test/abc.tar.gz'));
+}
+
+async function test_ps() {
+    const x = await ps_exec('/', ["ps", "-e"], true);
+    if (x.length) {
+        console.log(x[0]);
+        console.log("=====");
+        console.log(x[1]);
+    }
 }
 
 if (import.meta.main) main(Deno.args);
