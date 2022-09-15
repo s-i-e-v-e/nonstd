@@ -45,4 +45,12 @@ export class CharacterStream {
             }
         }
     }
+
+    get_index() {
+        return this.index;
+    }
+
+    substring(a: number, b: number) {
+        return this.xs.substring(a, b);
+    }
 }
