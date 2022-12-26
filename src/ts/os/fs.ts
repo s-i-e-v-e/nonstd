@@ -49,6 +49,14 @@ export function fs_ls(path: string): DirEntry[] {
     return Array.from(Deno.readDirSync(path));
 }
 
+export function fs_list_files(path: string): string[] {
+    return fs_ls(path).filter(x => x.isFile).map(x => x.name).sort();
+}
+
+export function fs_list_directories(path: string): string[] {
+    return fs_ls(path).filter(x => x.isDirectory).map(x => x.name).sort();
+}
+
 interface FileName {
     dir: string,
     name: string,
@@ -78,10 +86,28 @@ function fs_mkdir(path: string) {
     if (!fs_exists(path)) Deno.mkdirSync(path, { recursive: true });
 }
 
+export function fs_mv(source: string, dest: string) {
+    source = fs_canonical_path(source);
+    dest = fs_canonical_path(dest);
+    if (fs_exists(dest)) throw new Error(`File already exists: ${dest}`);
+    Deno.renameSync(source, dest);
+}
+
 export function fs_cp(source: string, dest: string) {
     source = fs_canonical_path(source);
     dest = fs_canonical_path(dest);
     copySync(source, dest);
+}
+
+export function fs_write_bin(path: string, data: Uint8Array) {
+    const fp = fs_parse_path(path);
+    fs_mkdir(fp.dir);
+    Deno.writeFileSync(fp.path, data);
+}
+
+export function fs_read_bin(path: string) {
+    path = fs_canonical_path(path);
+    return Deno.readFileSync(path);
 }
 
 export function fs_write_utf8(path: string, data: string) {
