@@ -70,6 +70,7 @@ export function fs_parse_path(path: string) {
     const dir = n === -1 ? "." : path.substring(0, n);
     path = n === -1 ? path : path.substring(n + 1);
 
+    if (path === '.' || path === '..') throw new Error();
     n = path.lastIndexOf(".");
     const name = n === -1 ? path : path.substring(0, n);
     const ext = n === -1 ? '' : path.substring(n);
@@ -90,6 +91,8 @@ export function fs_mv(source: string, dest: string) {
     source = fs_canonical_path(source);
     dest = fs_canonical_path(dest);
     if (fs_exists(dest)) throw new Error(`File already exists: ${dest}`);
+    const fp = fs_parse_path(dest);
+    if (fp.name) fs_mkdir(fp.dir);
     Deno.renameSync(source, dest);
 }
 
