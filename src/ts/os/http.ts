@@ -11,6 +11,7 @@ import { readAll } from "https://deno.land/std/io/util.ts";
 export interface Binary {
     mime: string,
     bytes: Uint8Array,
+    status: number
 }
 
 export type Resource = string|any|Uint8Array;
@@ -117,7 +118,7 @@ async function handle_new_connection(conn: Deno.Conn, handle_request: RequestHan
         headers.set("Referrer-Policy", "no-referrer");
         e.respondWith( new Response(new Blob([bin.bytes]), {
             headers: headers,
-            status: 200
+            status: bin.status || 200,
         }));
     }
 }
