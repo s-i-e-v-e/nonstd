@@ -37,15 +37,17 @@ function get_mime_type(url: string) {
     }
 }
 
-export function make_json_response(x: any) {
+export function make_json_response(status: number, x: any) {
     return {
+        status: status,
         mime: 'application/json',
         bytes: encoder.encode(JSON.stringify(x)),
     };
 }
 
-export function read_binary(p: string) {
+export function read_binary(status: number, p: string) {
     return {
+        status: status,
         mime: get_mime_type(p),
         bytes: Deno.readFileSync(p),
     }
