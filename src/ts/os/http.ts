@@ -5,8 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { readerFromStreamReader } from "https://deno.land/std/io/streams.ts";
-import { readAll } from "https://deno.land/std/io/util.ts";
+import { readAll, readerFromStreamReader } from "https://deno.land/std/streams/mod.ts";
 
 export interface Binary {
     mime: string,
