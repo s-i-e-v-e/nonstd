@@ -96,10 +96,10 @@ export function fs_mv(source: string, dest: string) {
     Deno.renameSync(source, dest);
 }
 
-export function fs_cp(source: string, dest: string) {
+export function fs_cp(source: string, dest: string, overwrite = false) {
     source = fs_canonical_path(source);
     dest = fs_canonical_path(dest);
-    copySync(source, dest);
+    copySync(source, dest, {overwrite: overwrite});
 }
 
 export function fs_write_bin(path: string, data: Uint8Array) {
