@@ -105,29 +105,23 @@ async function parse_request(request: Request): Promise<[string, string, Record<
     return [request.method, url.pathname, map];
 }
 
-async function handle_new_connection(conn: Deno.Conn, handle_request: RequestHandler) {
-    const requests = Deno.serveHttp(conn);
-    for await (const e of requests) {
-        const [method, path, map] = await parse_request(e.request);
-        const bin = await handle_request(method, path, map, e.request);
+async function handle_new_connection(request: Request, handle_request: RequestHandler) {
+    const [method, path, map] = await parse_request(request);
+    const bin = await handle_request(method, path, map, request);
 
-        const headers = new Headers();
-        headers.set("Cache-Control", 'max-age=0');
-        headers.set("Cache-Control", 'no-store');
-        headers.set("content-length", bin.bytes.length.toString());
-        headers.set("content-type", bin.mime);
-        headers.set("Referrer-Policy", "no-referrer");
-        e.respondWith( new Response(new Blob([bin.bytes]), {
-            headers: headers,
-            status: bin.status || 200,
-        }));
-    }
+    const headers = new Headers();
+    headers.set("Cache-Control", 'max-age=0');
+    headers.set("Cache-Control", 'no-store');
+    headers.set("content-length", bin.bytes.length.toString());
+    headers.set("content-type", bin.mime);
+    headers.set("Referrer-Policy", "no-referrer");
+    return new Response(new Blob([bin.bytes]), {
+        headers: headers,
+        status: bin.status || 200,
+    });
 }
 
 export async function http_serve(port: number, handle_request: RequestHandler) {
     console.log(`Serving at http://localhost:${port}/`);
-    const listener = Deno.listen({ port: port });
-    for await (const conn of listener) {
-        handle_new_connection(conn, handle_request);
-    }
+    Deno.serve({ port: port }, (request: Request) => handle_new_connection(request, handle_request));
 }
