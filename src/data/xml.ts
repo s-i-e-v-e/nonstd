@@ -21,15 +21,15 @@ export class Element {
         this.nodes = nodes;
     }
 
-    e(n: string) {
+    e(n: string): Element {
       return this.es(n)[0];
     }
 
-    es(n: string) {
+    es(n: string): Element[] {
         return this.nodes.map(y => y as Element).filter(y => y.name && y.name === n);
     }
 
-    a(a: string) {
+    a(a: string): string {
         return this.attrs
             .filter(xs => xs[0] === a)[0][1];
     }
@@ -42,13 +42,13 @@ export class Xml {
         this.cs = new CharacterStream(xs);
     }
 
-    normalize(x: string) {
+    normalize(x: string): string {
         x = x.replace('&lt;', '<');
         x = x.replace('&gt;', '>');
         return x;
     }
 
-    parse_text() {
+    parse_text(): string {
         const xs = [];
         for (; ;) {
             const c = this.cs.peek();
@@ -59,7 +59,7 @@ export class Xml {
         return this.normalize(xs.join(''));
     }
 
-    parse_name() {
+    parse_name(): string {
         this.cs.skip_ws();
         const xs = [];
         for (; ;) {
@@ -71,7 +71,7 @@ export class Xml {
         return xs.join('');
     }
 
-    parse_value() {
+    parse_value(): string {
         const xs = [];
         for (; ;) {
             const c = this.cs.peek();
@@ -90,7 +90,7 @@ export class Xml {
         if (this.cs.next() !== c) throw new Error();
     }
 
-    parse_attr() {
+    parse_attr(): string[] {
         const name = this.parse_name();
         this.cs.skip_ws();
         this.expect_t('=');
@@ -100,7 +100,7 @@ export class Xml {
         return [name, value];
     }
 
-    parse_el() {
+    parse_el(): Element {
         const c = this.cs.peek();
 
         if (c === '?' || c === '!') {
@@ -142,7 +142,7 @@ export class Xml {
         }
     }
 
-    parse() {
+    parse(): Element {
         const ys = [];
         for (;!this.cs.eof();) {
             this.cs.skip_ws();

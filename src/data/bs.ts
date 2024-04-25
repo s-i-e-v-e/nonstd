@@ -14,7 +14,7 @@ export interface BitStreamEosError {
     bit_count: number,
 }
 
-function BitStreamEosError() {
+function BitStreamEosError(): BitStreamEosError {
     const e = new Error();
     return {
         name: 'BitStreamEosError',
@@ -25,7 +25,7 @@ function BitStreamEosError() {
     };
 }
 
-export function is_bs_eos(e: Error) {
+export function is_bs_eos(e: Error): boolean {
     return e.name === 'BitStreamEosError';
 }
 
@@ -47,22 +47,22 @@ export class BitStream {
         this.xs = bs.xs;
     }
 
-    clone() {
+    clone(): BitStream {
         const bs = new BitStream(this.xs);
         bs.index = this.index;
         bs.bits = this.bits;
         return bs;
     }
 
-    eos() {
+    eos(): boolean {
         return this.index >= this.xs.byteLength;
     }
 
-    pos() {
+    pos(): number {
         return this.index;
     }
 
-    slice(start: number, end: number) {
+    slice(start: number, end: number): Uint8Array {
         return this.xs.slice(start, end);
     }
 
@@ -95,7 +95,7 @@ export class BitStream {
         this.index++;
     }
 
-    update(p: Uint8Array) {
+    update(p: Uint8Array): BitStream {
         const bs = new BitStream();
         bs.index = this.index;
         bs.bits = this.bits;
@@ -111,7 +111,7 @@ export class BitStream {
         this.index += p.byteLength;
     }
 
-    next_bit() {
+    next_bit(): number {
         if (this.eos()) throw BitStreamEosError();
         this.bits = this.bits || 8;
         const b = (this.xs[this.index] >> (8-this.bits)) & 1;
@@ -121,7 +121,7 @@ export class BitStream {
     }
 
     // lsb...msb
-    next_bits_lm(n: number) {
+    next_bits_lm(n: number): number {
         if (n === 0) throw new Error();
         let b = this.next_bit();
         for (let i = 1; i < n; i++) {
@@ -131,7 +131,7 @@ export class BitStream {
     }
 
     // msb...lsb
-    next_bits_ml(n: number) {
+    next_bits_ml(n: number): number {
         if (n === 0) throw new Error();
         let b = this.next_bit();
         for (let i = 1; i < n; i++) {
@@ -140,20 +140,20 @@ export class BitStream {
         return b;
     }
 
-    next_u16_ml() {
+    next_u16_ml(): number {
         const a = this.next_bits_ml(8);
         const b = this.next_bits_ml(8);
         return a | (b << 8);
     }
 
-    bytes_to_index() {
+    bytes_to_index(): Uint8Array {
         if (!this.index) throw new Error();
         const xs = this.xs.slice(0, this.index);
         if (xs.byteLength === 0) throw new Error();
         return xs;
     }
 
-    read_bytes(n: number) {
+    read_bytes(n: number): Uint8Array {
         const xs = this.xs.slice(this.index, this.index+n);
         this.index += xs.length;
         if (xs.length !== n) throw BitStreamEosError();

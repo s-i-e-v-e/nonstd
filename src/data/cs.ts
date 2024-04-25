@@ -14,15 +14,15 @@ export class CharacterStream {
         this.index = 0;
     }
 
-    eof() {
+    eof(): boolean {
         return this.index >= this.xs.length;
     }
 
-    peek() {
+    peek(): string {
         return this.xs[this.index];
     }
 
-    next() {
+    next(): string {
         return this.xs[this.index++];
     }
 
@@ -46,11 +46,11 @@ export class CharacterStream {
         }
     }
 
-    get_index() {
+    get_index(): number {
         return this.index;
     }
 
-    substring(a: number, b: number) {
+    substring(a: number, b: number): string {
         return this.xs.substring(a, b);
     }
 }

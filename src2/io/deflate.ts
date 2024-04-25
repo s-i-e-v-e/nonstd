@@ -7,7 +7,7 @@
  */
 export const DEFLATE_STORE = 0;
 
-export function zlib_raw_deflate(xs: Uint8Array, deflate_type: number) {
+export function zlib_raw_deflate(xs: Uint8Array, deflate_type: number): Uint8Array {
     switch (deflate_type) {
         case DEFLATE_STORE: break;
         default: throw new Error('unknown DEFLATE type');

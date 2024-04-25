@@ -5,11 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import {copySync} from "https://deno.land/std/fs/copy.ts"
+import {copySync} from "jsr:@std/fs/copy"
 
-import DirEntry = Deno.DirEntry;
-
-export function fs_canonical_path(path: string) {
+export function fs_canonical_path(path: string): string {
     const home = Deno.env.get('HOME');
     if (!home) throw new Error('$HOME is not defined.');
     const xdg_config_home = Deno.env.get('XDG_CONFIG_HOME') || `${home}/.config`;
@@ -34,17 +32,17 @@ function fs_exists(path: string) {
     }
 }
 
-export function fs_dir_exists(path: string) {
+export function fs_dir_exists(path: string): boolean {
     const x = fs_exists(path);
     return x && x.isDirectory;
 }
 
-export function fs_file_exists(path: string) {
+export function fs_file_exists(path: string): boolean {
     const x = fs_exists(path);
     return x && x.isFile;
 }
 
-export function fs_ls(path: string): DirEntry[] {
+export function fs_ls(path: string): Deno.DirEntry[] {
     path = fs_canonical_path(path);
     return Array.from(Deno.readDirSync(path));
 }
@@ -64,7 +62,7 @@ interface FileName {
     path: string,
 }
 
-export function fs_parse_path(path: string) {
+export function fs_parse_path(path: string): FileName {
     path = fs_canonical_path(path);
     let n = path.lastIndexOf("/");
     const dir = n === -1 ? "." : path.substring(0, n);
@@ -79,7 +77,7 @@ export function fs_parse_path(path: string) {
         name: name,
         ext: ext,
         path: `${dir}/${name}${ext}`
-    } as FileName;
+    };
 }
 
 function fs_mkdir(path: string) {
@@ -108,7 +106,7 @@ export function fs_write_bin(path: string, data: Uint8Array) {
     Deno.writeFileSync(fp.path, data);
 }
 
-export function fs_read_bin(path: string) {
+export function fs_read_bin(path: string): Uint8Array {
     path = fs_canonical_path(path);
     return Deno.readFileSync(path);
 }
@@ -119,12 +117,12 @@ export function fs_write_utf8(path: string, data: string) {
     Deno.writeTextFileSync(fp.path, data);
 }
 
-export function fs_read_utf8(path: string) {
+export function fs_read_utf8(path: string): string {
     path = fs_canonical_path(path);
     return Deno.readTextFileSync(path);
 }
 
-export function fs_read_utf8_list(path: string) {
+export function fs_read_utf8_list(path: string): string[] {
     path = fs_canonical_path(path);
     return fs_read_utf8(path).split('\n');
 }

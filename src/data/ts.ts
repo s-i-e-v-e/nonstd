@@ -14,15 +14,15 @@ export class TokenStream<A> {
         this.index = 0;
     }
 
-    eof() {
+    eof(): boolean {
         return this.index >= this.xs.length;
     }
 
-    peek() {
+    peek(): A {
         return this.xs[this.index];
     }
 
-    next() {
+    next(): A {
         return this.xs[this.index++];
     }
 }

@@ -8,6 +8,6 @@
 
 const utf8_en = new TextEncoder();
 const utf8_de = new TextDecoder();
-export function text_bin_to_utf8(xs: Uint8Array) {
+export function text_bin_to_utf8(xs: Uint8Array): string {
     return utf8_de.decode(xs);
 }

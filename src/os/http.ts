@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { readAll, readerFromStreamReader } from "https://deno.land/std/streams/mod.ts";
+import { toText } from "jsr:@std/streams";
 
 export interface Binary {
     mime: string,
@@ -36,7 +36,7 @@ function get_mime_type(url: string) {
     }
 }
 
-export function make_json_response(status: number, x: any) {
+export function make_json_response(status: number, x: any): Binary {
     return {
         status: status,
         mime: 'application/json',
@@ -44,7 +44,7 @@ export function make_json_response(status: number, x: any) {
     };
 }
 
-export function read_binary(status: number, p: string) {
+export function read_binary(status: number, p: string): Binary {
     return {
         status: status,
         mime: get_mime_type(p),
@@ -53,9 +53,8 @@ export function read_binary(status: number, p: string) {
 }
 
 async function read_request(request: Request) {
-    const reader = request?.body?.getReader();
-    if (reader) {
-        return new TextDecoder().decode(await readAll(readerFromStreamReader(reader)));
+    if (request.body) {
+        return toText(request.body);
     }
     else {
         throw new Error();
