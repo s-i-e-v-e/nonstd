@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import {copySync} from "jsr:@std/fs/copy"
+import {copySync} from "@std/fs/copy"
 
 export function fs_canonical_path(path: string): string {
     const home = Deno.env.get('HOME');
