@@ -1,12 +1,16 @@
 {
   "name": "@sieve/nonstd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "imports": {
     "@std/fs": "jsr:@std/fs@0.224",
     "@std/streams": "jsr:@std/streams@0.224",
     "@db/sqlite": "jsr:@db/sqlite@0.11"
   },
-  "exports": "./src/mod.ts",
+  "exports": {
+  	"./data": "./src/data/mod.ts",
+  	"./os": "./src/os/mod.ts",
+  	"./db": "./src/db/mod.ts"
+  },
   "publish": {
     "include": [
       "./LICENSE",
