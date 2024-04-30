@@ -8,10 +8,12 @@
 export class CharacterStream {
     private readonly xs: string;
     private index: number;
+    public name: string;
 
-    constructor(xs: string) {
+    constructor(xs: string, name?: string) {
         this.xs = xs;
         this.index = 0;
+        this.name = name || '';
     }
 
     eof(): boolean {
@@ -48,6 +50,21 @@ export class CharacterStream {
 
     get_index(): number {
         return this.index;
+    }
+
+    get_line_and_character(n: number): [number, number] {
+        let line = 1;
+        let character = 0;
+        for (let i = 0; i < this.xs.length; i++) {
+            if (i === n) break;
+            character++;
+
+            if (this.xs[i] === '\n') {
+                line++;
+                character = 0;
+            }
+        }
+        return [line, character];
     }
 
     substring(a: number, b: number): string {
