@@ -8,10 +8,12 @@
 export class TokenStream<A> {
     private readonly xs: A[];
     private index: number;
+    public name: string;
 
-    constructor(xs: A[]) {
+    constructor(xs: A[], name?: string) {
         this.xs = xs;
         this.index = 0;
+        this.name = name || '';
     }
 
     eof(): boolean {
