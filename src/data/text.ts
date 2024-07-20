@@ -11,3 +11,6 @@ const utf8_de = new TextDecoder();
 export function text_bin_to_utf8(xs: Uint8Array): string {
     return utf8_de.decode(xs);
 }
+export function text_utf8_to_bin(x: string): Uint8Array {
+    return utf8_en.encode(x);
+}
