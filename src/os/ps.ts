@@ -5,24 +5,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import {text_bin_to_utf8} from "../data/text.ts";
+import { text_bin_to_utf8 } from "../data/text.ts";
 
 export async function ps_exec(cwd: string, cmd: string[], redirect_io = false): Promise<string[]> {
-    const p = Deno.run({
-        cwd: cwd,
-        cmd: cmd,
+    const [bin, ...args] = cmd;
+    const p = new Deno.Command(bin, {
+        cwd,
+        args,
         stdout: redirect_io ? "piped" : "inherit",
         stderr: redirect_io ? "piped" : "inherit",
     });
-    const out = [];
+
+    const result = await p.output();
+
+    if (!result.success) throw new Error(`Failed: ${cmd.join(' ')}`);
+
     if (redirect_io) {
-        out.push(text_bin_to_utf8(await p.output()));
-        out.push(text_bin_to_utf8(await p.stderrOutput()));
-     }
+        return [
+            text_bin_to_utf8(result.stdout),
+            text_bin_to_utf8(result.stderr),
+        ];
+    }
 
-    const status = await p.status();
-
-    if (!status.success) throw new Error(`Failed: ${cmd.join(' ')}`);
-
-    return out;
+    return [];
 }

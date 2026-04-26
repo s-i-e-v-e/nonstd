@@ -13,7 +13,7 @@ export interface Binary {
     status: number
 }
 
-export type Resource = string|any|Uint8Array;
+export type Resource = string | any | Uint8Array;
 export type RequestHandler = (method: string, url: string, map: Record<string, Resource>, re: Request) => Promise<Binary>;
 
 const encoder = new TextEncoder();
@@ -21,7 +21,7 @@ const decoder = new TextDecoder();
 
 function get_mime_type(url: string) {
     const ext = url.substring(url.lastIndexOf('.'));
-    switch(ext) {
+    switch (ext) {
         case '.css': return 'text/css';
         case '.js': return 'application/javascript';
         case '.html': return 'text/html';
@@ -63,7 +63,7 @@ async function read_request(request: Request) {
 
 async function parse_request(request: Request): Promise<[string, string, Record<string, Resource>]> {
     const url = new URL(request.url);
-    const ct = (request.headers.get('content-type')||'').split(';')[0];
+    const ct = (request.headers.get('content-type') || '').split(';')[0];
 
     const map: Record<string, Resource> = {};
     for (const p of url.searchParams) {
@@ -114,7 +114,7 @@ async function handle_new_connection(request: Request, handle_request: RequestHa
     headers.set("content-length", bin.bytes.length.toString());
     headers.set("content-type", bin.mime);
     headers.set("Referrer-Policy", "no-referrer");
-    return new Response(new Blob([bin.bytes]), {
+    return new Response(new Blob([new Uint8Array(bin.bytes)]), {
         headers: headers,
         status: bin.status || 200,
     });
